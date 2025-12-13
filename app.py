@@ -62,7 +62,7 @@ def handle_decode():
         if not file or not bit_map_str:
             return jsonify({"error": "資料不完整"}), 400
 
-        img = Image.open(file.stream).convert("RGB")
+        img = Image.open(file.stream)
         bit_map = json.loads(bit_map_str)
         bit_map.sort(key=lambda x: (x['b'], x['c']))
         
@@ -82,7 +82,7 @@ def handle_auto_decode():
         file = request.files.get('image')
         if not file: return jsonify({"error": "未上傳圖片"}), 400
         
-        img = Image.open(file.stream).convert("RGB")
+        img = Image.open(file.stream)
         
         # 定義常見策略
         suspects = [
