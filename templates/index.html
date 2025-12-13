@@ -233,7 +233,15 @@
             const res = await fetch(`/${action}`, { method: 'POST', body: formData });
             
             if(action === 'encode') {
-                if(!res.ok) throw new Error(await res.text());
+                // === 改良區塊開始 ===
+                if(!res.ok) {
+                    // 先嘗試讀取伺服器回傳的錯誤文字
+                    const errText = await res.text();
+                    // 如果文字是空的 (例如 Nginx/Gunicorn 直接擋掉時)，就顯示狀態碼
+                    throw new Error(errText || `伺服器連線錯誤 (代碼: ${res.status})`);
+                }
+                // === 改良區塊結束 ===
+
                 const blob = await res.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -257,7 +265,9 @@
                 }
             }
         } catch(e) {
-            statusEl.innerText = "錯誤: " + e.message;
+            // 這裡也加了保險，如果 e.message 抓不到，至少顯示 "未知錯誤"
+            console.error("詳細錯誤內容:", e); 
+            statusEl.innerText = "錯誤: " + (e.message || "未知錯誤");
             statusEl.style.color = "red";
         }
     }
