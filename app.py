@@ -32,7 +32,7 @@ def handle_encode():
         bit_map = json.loads(bit_map_str)
         bit_map.sort(key=lambda x: (x['b'], x['c']))
         
-        img = Image.open(file.stream).convert("RGB")
+        img = Image.open(file.stream)
         
         # 呼叫核心邏輯
         secret_img = encode_image(img, message, bit_map)
