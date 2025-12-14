@@ -10,13 +10,68 @@ def str_to_bin(message):
     return ''.join(format(b, '08b') for b in message.encode('utf-8'))
 
 def bin_to_str(binary_data):
-    """將二進位轉回文字"""
-    chars = []
+    """
+    修正版：將二進位字串轉回 UTF-8 文字
+    支援中文的關鍵：先收集成 bytearray，再一次性 decode
+    """
+    byte_data = bytearray()
+    
     for i in range(0, len(binary_data), 8):
-        byte = binary_data[i:i+8]
-        if len(byte) < 8: break
-        chars.append(chr(int(byte, 2)))
-    return ''.join(chars)
+        chunk = binary_data[i:i+8]
+        # 如果最後不滿 8 bit 就丟掉 (避免錯誤)
+        if len(chunk) < 8: break
+        
+        byte_val = int(chunk, 2)
+        byte_data.append(byte_val)
+    
+    try:
+        # errors='replace' 是浮水印的關鍵！
+        # 如果 DCT 因為圖片受損導致某個 bit 讀錯，UTF-8 解碼會失敗。
+        # 用 replace 模式，它會把讀錯的字變成  (問號)，但其他字還能正常顯示！
+        return byte_data.decode('utf-8', errors='replace')
+    except Exception:
+        return ""
+
+def extract_dct(img_pil: Image.Image) -> str:
+    """讀取 DCT 浮水印 (修正版)"""
+    img_np = np.array(img_pil)
+    
+    # 轉 YCrCb (確保相容灰階與 RGB)
+    if len(img_np.shape) == 2: 
+         img_cv = cv2.cvtColor(img_np, cv2.COLOR_GRAY2BGR)
+         img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2YCrCb)
+    else:
+         img_cv = cv2.cvtColor(img_np, cv2.COLOR_RGB2YCrCb)
+         
+    h, w, _ = img_cv.shape
+    y_channel = img_cv[:, :, 0].astype(np.float32)
+    
+    extracted_bits = ""
+    delimiter = "#####"
+    
+    # 遍歷區塊讀取
+    for row in range(0, h - 7, 8):
+        for col in range(0, w - 7, 8):
+            block = y_channel[row:row+8, col:col+8]
+            dct_block = cv2.dct(block)
+            
+            p1 = dct_block[4, 1]
+            p2 = dct_block[3, 2]
+            
+            if p1 > p2:
+                extracted_bits += "0"
+            else:
+                extracted_bits += "1"
+    
+    # 嘗試解碼
+    full_text = bin_to_str(extracted_bits)
+        
+    if delimiter in full_text:
+        return full_text.split(delimiter)[0]
+    
+    # 如果找不到結束符號，回傳部分內容給使用者參考 (通常是因為圖片被裁切導致結尾遺失)
+    # 我們只回傳前 20 個字，避免畫面被大量亂碼塞滿
+    return f"未找到完整結束符號 (可能圖片被裁切)，嘗試解讀部分內容：{full_text[:20]}..."
 
 def embed_dct(img_pil: Image.Image, message: str) -> Image.Image:
     """
@@ -93,7 +148,7 @@ def embed_dct(img_pil: Image.Image, message: str) -> Image.Image:
     img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_YCrCb2RGB)
     return Image.fromarray(img_rgb)
 
-def extract_dct(img_pil: Image.Image) -> str:
+
     """讀取 DCT 浮水印"""
     img_np = np.array(img_pil)
     
