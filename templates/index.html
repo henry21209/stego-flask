@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://fav.farm/🔒" />
     <title>終極隱寫術工具箱</title>
     <style>
         :root { --primary: #4a90e2; --success: #2ecc71; --danger: #e74c3c; --warn: #f39c12; --bg: #f4f7f6; }
         
-        /* 基礎設定 */
+        /* === 基礎設定 === */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: var(--bg); 
             display: flex; 
             justify-content: center; 
-            padding: 15px; /* 手機版邊距縮小 */
+            padding: 15px; 
             min-height: 100vh; 
             box-sizing: border-box; 
             margin: 0;
@@ -33,19 +34,19 @@
             text-align: center; 
             color: #333; 
             margin: 10px 0 20px 0; 
-            font-size: 1.5rem; /* 手機版標題不要太大 */
+            font-size: 1.5rem; 
         }
         
-        /* Tabs 分頁選單 - RWD 優化 */
+        /* === Tabs 分頁選單 === */
         .tabs { 
             display: flex; 
             margin-bottom: 20px; 
             border-bottom: 2px solid #eee; 
-            flex-wrap: wrap; /* 螢幕太小自動換行 */
+            flex-wrap: wrap; 
         }
         .tab { 
             flex: 1; 
-            padding: 12px 5px; /* 減少左右 padding 塞下更多字 */
+            padding: 12px 5px; 
             cursor: pointer; 
             text-align: center; 
             font-weight: bold; 
@@ -53,13 +54,13 @@
             transition: 0.3s; 
             border-bottom: 3px solid transparent; 
             font-size: 0.95rem;
-            white-space: nowrap; /* 防止文字斷行 */
+            white-space: nowrap; 
         }
         .tab:hover { background: #f9f9f9; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
         .tab.analyze-tab.active { color: var(--warn); border-bottom: 3px solid var(--warn); }
 
-        /* 位元選擇區 - RWD 優化 */
+        /* === 位元選擇區 === */
         .controls-wrapper { 
             background: #fafafa; 
             border: 1px solid #eee; 
@@ -80,7 +81,7 @@
         .reset-btn { 
             background: #e0e0e0; 
             border: none; 
-            padding: 8px 15px; /* 加大按鈕 */
+            padding: 8px 15px; 
             border-radius: 4px; 
             cursor: pointer; 
             font-size: 0.85rem; 
@@ -93,7 +94,6 @@
         .grid-header { font-weight: bold; padding: 6px; border-radius: 4px; font-size: 0.9rem; }
         .grid-row-label { font-weight: bold; line-height: 28px; color: #777; font-size: 0.9rem; }
         
-        /* 🔥 加大手機勾選框，比較好按 */
         .bit-check { 
             width: 24px; 
             height: 24px; 
@@ -102,16 +102,16 @@
             vertical-align: middle;
         }
 
-        /* Panels */
+        /* === Panels === */
         .panel { display: none; animation: fadeIn 0.3s; }
         .panel.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 表單元素 - 防止 iOS 放大 */
+        /* === 表單元素 === */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
         
-        /* 設定 font-size 16px 防止 iOS 輸入時自動放大畫面 */
+        /* 防止 iOS 自動放大 */
         input[type="file"], textarea, input[type="text"] { 
             width: 100%; 
             padding: 12px; 
@@ -122,10 +122,10 @@
         }
         textarea { min-height: 100px; resize: vertical; font-family: inherit; }
         
-        /* 按鈕優化 */
+        /* === 按鈕優化 === */
         .btn { 
             width: 100%; 
-            padding: 14px; /* 加高按鈕 */
+            padding: 14px; 
             border: none; 
             border-radius: 6px; 
             cursor: pointer; 
@@ -134,22 +134,26 @@
             color: white; 
             transition: 0.2s; 
             margin-top: 10px; 
-            /* 防止連點選取文字 */
             user-select: none; 
             -webkit-user-select: none; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .btn:active { transform: scale(0.98); } /* 點擊回饋 */
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background-color: #ccc !important; cursor: not-allowed; opacity: 0.8; transform: none; }
+        
         .btn-blue { background: var(--primary); } .btn-blue:hover { background: #357abd; }
         .btn-green { background: var(--success); } .btn-green:hover { background: #27ae60; }
         .btn-purple { background: #9b59b6; } .btn-purple:hover { background: #8e44ad; }
         
         .status-msg { margin-top: 15px; text-align: center; font-size: 1rem; font-weight: 500; min-height: 20px; line-height: 1.5; }
         
-        /* 結果區域 */
+        /* === 結果區域 === */
         #result-area { margin-top: 15px; display: none; }
         .result-box { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); word-break: break-all; white-space: pre-wrap; font-size: 0.95rem; }
         
-        /* 偵測 Canvas 響應式 */
+        /* === 偵測 Canvas 響應式 (支援雙圖) === */
         .canvas-container { 
             margin: 15px 0; 
             border: 2px dashed #ccc; 
@@ -158,7 +162,7 @@
             padding: 10px; 
             border-radius: 8px; 
             display: flex; 
-            flex-wrap: wrap; /* 關鍵：讓它能換行 */
+            flex-wrap: wrap; 
             justify-content: center; 
             gap: 15px; 
         }
@@ -179,7 +183,7 @@
         
         .canvas-label { color: #ccc; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
         
-        /* 偵測按鈕群組 */
+        /* === 偵測按鈕群組 === */
         .bit-buttons-grid { 
             display: grid; 
             grid-template-columns: 30px 1fr; 
@@ -190,52 +194,48 @@
         .btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
         .bit-btn { 
             flex: 1; 
-            padding: 8px 0; /* 加高按鈕 */
+            padding: 8px 0; 
             font-size: 0.9rem; 
             cursor: pointer; 
             background: #fff; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
-            min-width: 35px; /* 確保按鈕不會太窄 */
+            min-width: 35px; 
         }
         .bit-btn:hover { background: #eee; }
         .bit-btn.active { background: #333; color: white; border-color: black; }
 
-        /* 📱 手機版專用調整 (寬度小於 600px 時生效) */
+        /* === 🌀 載入動畫 (Spinner) === */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* === 📱 手機版 RWD 調整 (Plan A: 強制一排) === */
         @media (max-width: 600px) {
-            .container { padding: 15px; } /* 縮小外框內距，爭取空間 */
+            .container { padding: 15px; }
             h1 { font-size: 1.4rem; }
             
             .tab { font-size: 0.85rem; padding: 10px 2px; }
+            
+            /* 讓畫布變直排 */
             .canvas-box { width: 100%; min-width: 100%; }
             
-            /* === 🔥 關鍵修改開始：讓 8 個按鈕強制一行 === */
+            /* 按鈕強制一排 (Plan A) */
+            .btn-group { flex-wrap: nowrap; gap: 2px; }
+            .bit-btn { padding: 8px 0; font-size: 0.75rem; min-width: 0; flex: 1; }
             
-            /* 1. 調整按鈕群組的排列方式 */
-            .btn-group { 
-                flex-wrap: nowrap; /* 禁止換行！ */
-                gap: 2px;          /* 按鈕間距縮小 */
-            }
+            /* 調整標籤 */
+            .bit-buttons-grid { grid-template-columns: 20px 1fr; gap: 5px; }
+            .bit-buttons-grid > div:nth-child(odd) { font-size: 0.9rem; }
             
-            /* 2. 縮小按鈕尺寸 */
-            .bit-btn { 
-                padding: 8px 0; 
-                font-size: 0.75rem; /* 字變小一點 */
-                min-width: 0;       /* 移除最小寬度限制，讓它能縮小 */
-                flex: 1;            /* 大家平分空間 */
-            }
-            
-            /* 3. 調整標籤 R/G/B 的寬度與字體 */
-            .bit-buttons-grid {
-                grid-template-columns: 20px 1fr; /* 左邊標籤改窄一點 */
-                gap: 5px; /* 標籤與按鈕的距離縮小 */
-            }
-            
-            .bit-buttons-grid > div:nth-child(odd) {
-                font-size: 0.9rem; /* R G B 字體微調 */
-            }
-            /* === 關鍵修改結束 === */
-
             label { margin-top: 10px; }
         }
     </style>
@@ -311,11 +311,11 @@
 
         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
             <div class="form-group" style="flex: 1;">
-                <label>1. 上傳原圖 (或是圖片 A)</label>
+                <label>1. 上傳原圖 (圖片 A)</label>
                 <input type="file" id="ana-file-1" accept="image/*">
             </div>
             <div class="form-group" style="flex: 1;">
-                <label>2. 上傳加密圖 (或是圖片 B)</label>
+                <label>2. 上傳加密圖 (圖片 B)</label>
                 <input type="file" id="ana-file-2" accept="image/*">
             </div>
         </div>
@@ -359,8 +359,8 @@
         </div>
         
         <div class="form-group">
-            <label>2. 浮水印內容 (建議簡短，如版權名)</label>
-            <input type="text" id="dct-msg" placeholder="例如: ©Henry2025" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid #ddd; border-radius:6px;">
+            <label>2. 浮水印內容 (建議簡短)</label>
+            <input type="text" id="dct-msg" placeholder="例如: ©Henry2025" style="width:100%;">
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -374,13 +374,21 @@
             <span id="dct-res-text"></span>
         </div>
     </div>
+
+    <div id="progress-container" style="display: none; margin-top: 15px;">
+        <div style="background: #eee; border-radius: 10px; height: 10px; overflow: hidden; width: 100%;">
+            <div id="fake-progress-bar" style="background: var(--primary); width: 0%; height: 100%; transition: width 0.3s ease-out;"></div>
+        </div>
+        <div id="progress-text" style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 5px;">0%</div>
+    </div>
+
 </div>
 
 <script>
-    // === 1. 初始化與全域變數 ===
+    // === 1. 初始化介面 ===
     const grid = document.getElementById('bitGrid');
     
-    // 生成位元選擇網格 (7 down to 0)
+    // 生成位元選擇網格
     for (let i = 7; i >= 0; i--) {
         let rowLabel = document.createElement('div');
         rowLabel.className = 'grid-row-label';
@@ -394,13 +402,13 @@
             chk.className = 'bit-check';
             chk.dataset.bit = i;
             chk.dataset.channel = c;
-            if (i === 0) chk.checked = true; // 預設選 Bit 0
+            if (i === 0) chk.checked = true; 
             wrapper.appendChild(chk);
             grid.appendChild(wrapper);
         }
     }
 
-    // 生成偵測面板的按鈕
+    // 生成偵測面板按鈕
     for(let c=0; c<3; c++) {
         let group = document.getElementById(`btn-group-${c}`);
         for(let i=7; i>=0; i--) {
@@ -412,33 +420,29 @@
         }
     }
 
-    // === 2. 核心功能函式 ===
+    // === 2. UI 切換邏輯 ===
+    function setMode(mode) {
+        // Tabs 樣式
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Panels 切換
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`${mode}-panel`).classList.add('active');
+
+        // 隱藏/顯示位元地圖
+        const controlWrapper = document.querySelector('.controls-wrapper');
+        if (mode === 'dct' || mode === 'analyze') {
+            controlWrapper.style.display = 'none';
+        } else {
+            controlWrapper.style.display = 'block';
+        }
+    }
 
     function resetToDefault() {
         document.querySelectorAll('.bit-check').forEach(chk => {
             chk.checked = (chk.dataset.bit === "0");
         });
-    }
-
-    function setMode(mode) {
-        // 1. 處理 Tab 樣式
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        // 2. 處理面板切換
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(`${mode}-panel`).classList.add('active');
-
-        // 3. ✨ 優化：在 DCT 或 Analyze 模式下，隱藏上方的位元地圖
-        const controlWrapper = document.querySelector('.controls-wrapper');
-        
-        // 如果是 DCT (浮水印) 或 Analyze (偵測)，都把上面的勾選框藏起來
-        if (mode === 'dct' || mode === 'analyze') {
-            controlWrapper.style.display = 'none';
-        } else {
-            // 只有 Encode (加密) 和 Decode (解密) 需要它
-            controlWrapper.style.display = 'block';
-        }
     }
 
     function getBitMap() {
@@ -450,13 +454,63 @@
         return map;
     }
 
+    // === 3. 🎭 假進度條控制器 ===
+    let progressInterval = null;
+    const totalDuration = 10000; // 目標 10 秒
+
+    function startFakeProgress() {
+        const container = document.getElementById('progress-container');
+        const bar = document.getElementById('fake-progress-bar');
+        const text = document.getElementById('progress-text');
+        
+        container.style.display = 'block';
+        bar.style.width = '0%';
+        text.innerText = '0%';
+        
+        let currentProgress = 0;
+        const startTime = Date.now();
+        
+        if (progressInterval) clearInterval(progressInterval);
+
+        progressInterval = setInterval(() => {
+            const elapsedTime = Date.now() - startTime;
+            const idealProgress = (elapsedTime / totalDuration) * 99;
+            const randomStep = Math.random() * 2; 
+            
+            if (currentProgress < idealProgress) {
+                currentProgress += randomStep;
+            } else {
+                currentProgress += 0.05;
+            }
+
+            if (currentProgress >= 99) currentProgress = 99;
+
+            bar.style.width = `${currentProgress}%`;
+            text.innerText = `${Math.floor(currentProgress)}%`;
+        }, 100);
+    }
+
+    function finishFakeProgress() {
+        const bar = document.getElementById('fake-progress-bar');
+        const text = document.getElementById('progress-text');
+        
+        if (progressInterval) clearInterval(progressInterval);
+        
+        bar.style.width = '100%';
+        text.innerText = '100% 完成！';
+        
+        setTimeout(() => {
+            document.getElementById('progress-container').style.display = 'none';
+        }, 1500);
+    }
+
+    // === 4. LSB 處理邏輯 ===
     async function process(action) {
         const fileInput = document.getElementById(action === 'encode' ? 'enc-file' : 'dec-file');
         const statusEl = document.getElementById(action === 'encode' ? 'enc-status' : 'dec-status');
         const resultArea = document.getElementById('result-area');
         
         statusEl.innerText = "";
-        statusEl.style.color = "#333";
         
         if(!fileInput.files[0]) { alert("請選擇圖片"); return; }
         
@@ -471,21 +525,24 @@
             const msg = document.getElementById('enc-msg').value;
             if(!msg) { alert("請輸入訊息"); return; }
             formData.append('message', msg);
-            statusEl.innerText = "處理中...";
+            statusEl.innerHTML = '<div class="spinner"></div> 正在寫入隱藏訊息...';
         } else {
-            statusEl.innerText = "解碼中...";
+            statusEl.innerHTML = '<div class="spinner"></div> 正在解碼分析中...';
             resultArea.style.display = 'none';
         }
+
+        startFakeProgress(); // 啟動進度條
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
 
         try {
             const res = await fetch(`/${action}`, { method: 'POST', body: formData });
             
-            // 🔥 【優化重點】把檢查移到最上面，同時保護加密與解密
             if(!res.ok) {
                 const errText = await res.text();
-                // 如果文字是空的，就顯示狀態碼 (例如 502 Bad Gateway)
                 throw new Error(errText || `伺服器連線錯誤 (代碼: ${res.status})`);
             }
+
+            finishFakeProgress(); // 完成進度條
 
             if(action === 'encode') {
                 const blob = await res.blob();
@@ -511,9 +568,62 @@
                 }
             }
         } catch(e) {
-            console.error("詳細錯誤內容:", e);
+            console.error(e);
+            if (progressInterval) clearInterval(progressInterval);
+            document.getElementById('progress-container').style.display = 'none';
             statusEl.innerText = "錯誤: " + (e.message || "未知錯誤");
             statusEl.style.color = "red";
+        } finally {
+            document.querySelectorAll('.btn').forEach(b => b.disabled = false);
+        }
+    }
+
+    async function autoDecode() {
+        const fileInput = document.getElementById('dec-file');
+        const statusEl = document.getElementById('dec-status');
+        const resultArea = document.getElementById('result-area');
+        
+        if(!fileInput.files[0]) { alert("請先上傳圖片"); return; }
+        
+        statusEl.innerHTML = '<div class="spinner" style="border-top-color: var(--warn);"></div> 正在暴力破解...';
+        statusEl.style.color = "var(--warn)";
+        resultArea.style.display = 'none';
+        
+        startFakeProgress();
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+        
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        
+        try {
+            const res = await fetch('/auto_decode', { method: 'POST', body: formData });
+            const data = await res.json();
+            
+            finishFakeProgress();
+
+            if(data.success) {
+                document.getElementById('res-title').innerHTML = `🎉 破解成功！(策略: ${data.strategy})`;
+                document.getElementById('dec-result-text').innerText = data.message;
+                resultArea.style.display = 'block';
+                statusEl.innerText = "✅ 訊息已還原";
+                statusEl.style.color = "green";
+                
+                resetToDefault();
+                document.querySelectorAll('.bit-check').forEach(chk => chk.checked = false);
+                data.found_map.forEach(m => {
+                    const chk = document.querySelector(`.bit-check[data-channel="${m.c}"][data-bit="${m.b}"]`);
+                    if(chk) chk.checked = true;
+                });
+            } else {
+                statusEl.innerText = "❌ " + data.message;
+                statusEl.style.color = "red";
+            }
+        } catch(e) {
+            if (progressInterval) clearInterval(progressInterval);
+            statusEl.innerText = "錯誤: " + e.message;
+            statusEl.style.color = "red";
+        } finally {
+            document.querySelectorAll('.btn').forEach(b => b.disabled = false);
         }
     }
 
@@ -523,18 +633,20 @@
         const statusEl = document.getElementById('dct-status');
         const resBox = document.getElementById('dct-result-box');
         
-        statusEl.innerText = (action === 'dct_encode' ? "製作中..." : "分析中...");
+        statusEl.innerHTML = '<div class="spinner" style="border-top-color: #e67e22;"></div> ' + (action === 'dct_encode' ? "正在製作浮水印..." : "正在提取浮水印...");
         statusEl.style.color = "#333";
         resBox.style.display = 'none';
 
         if(!fileInput.files[0]) { alert("請選擇圖片"); return; }
         if(action === 'encode' && !msgInput.value) { alert("請輸入浮水印文字"); return; }
 
+        startFakeProgress();
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
         if(action === 'encode') formData.append('message', msgInput.value);
 
-        // 對應後端路由名稱
         const route = action === 'encode' ? '/dct_encode' : '/dct_decode';
 
         try {
@@ -544,6 +656,8 @@
                 const errText = await res.text();
                 throw new Error(errText || `伺服器錯誤 (${res.status})`);
             }
+            
+            finishFakeProgress();
 
             if(action === 'encode') {
                 const blob = await res.blob();
@@ -562,61 +676,20 @@
             }
         } catch(e) {
             console.error(e);
+            if (progressInterval) clearInterval(progressInterval);
             statusEl.innerText = "錯誤: " + e.message;
             statusEl.style.color = "red";
+        } finally {
+            document.querySelectorAll('.btn').forEach(b => b.disabled = false);
         }
     }
 
-    async function autoDecode() {
-        const fileInput = document.getElementById('dec-file');
-        const statusEl = document.getElementById('dec-status');
-        const resultArea = document.getElementById('result-area');
-        
-        if(!fileInput.files[0]) { alert("請先上傳圖片"); return; }
-        
-        statusEl.innerText = "🕵️‍♂️ 正在暴力破解所有常見組合...";
-        statusEl.style.color = "var(--warn)";
-        resultArea.style.display = 'none';
-        
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-        
-        try {
-            const res = await fetch('/auto_decode', { method: 'POST', body: formData });
-            const data = await res.json();
-            
-            if(data.success) {
-                document.getElementById('res-title').innerHTML = `🎉 破解成功！(策略: ${data.strategy})`;
-                document.getElementById('dec-result-text').innerText = data.message;
-                resultArea.style.display = 'block';
-                statusEl.innerText = "✅ 訊息已還原";
-                statusEl.style.color = "green";
-                
-                // 自動更新 UI 勾選框
-                resetToDefault();
-                document.querySelectorAll('.bit-check').forEach(chk => chk.checked = false); // 全清
-                data.found_map.forEach(m => {
-                    const chk = document.querySelector(`.bit-check[data-channel="${m.c}"][data-bit="${m.b}"]`);
-                    if(chk) chk.checked = true;
-                });
-            } else {
-                statusEl.innerText = "❌ " + data.message;
-                statusEl.style.color = "red";
-            }
-        } catch(e) {
-            statusEl.innerText = "錯誤: " + e.message;
-        }
-    }
-
-    // === 3. 視覺化偵測邏輯 (雙圖比較版) ===
-    
-    // 儲存兩張圖片的原始數據
+    // === 5. 偵測邏輯 (雙圖) ===
     const imgDataStore = {
         1: { original: null, width: 0, height: 0 },
         2: { original: null, width: 0, height: 0 }
     };
 
-    // 綁定兩個上傳按鈕的事件
     setupAnalyzeUpload('ana-file-1', 1);
     setupAnalyzeUpload('ana-file-2', 2);
 
@@ -628,11 +701,9 @@
                     const img = new Image();
                     img.src = evt.target.result;
                     img.onload = () => {
-                        // 1. 顯示對應的畫布容器
                         document.getElementById(`box-${slotId}`).style.display = 'block';
                         document.getElementById('empty-msg').style.display = 'none';
 
-                        // 2. 繪製到 Canvas 並提取原始數據
                         const canvas = document.getElementById(`ana-canvas-${slotId}`);
                         const ctx = canvas.getContext('2d');
                         
@@ -640,15 +711,13 @@
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
                         
-                        // 3. 存入全域變數
                         imgDataStore[slotId].original = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         imgDataStore[slotId].width = img.width;
                         imgDataStore[slotId].height = img.height;
                         
-                        // 4. 自動重繪目前選中的 Bit (如果有的話)
                         const activeBtn = document.querySelector('.bit-btn.active');
                         if (activeBtn) {
-                            activeBtn.click(); // 觸發重繪
+                            activeBtn.click();
                         } else {
                             document.getElementById('ana-hint').innerText = "圖片已載入，請選擇通道查看。";
                         }
@@ -660,27 +729,23 @@
     }
 
     function visualizeBit(ch, bit, btn) {
-        // 如果兩張圖都沒有，就不執行
         if(!imgDataStore[1].original && !imgDataStore[2].original) { 
             alert("請至少上傳一張圖片"); 
             return; 
         }
         
-        // 更新按鈕樣式
         document.querySelectorAll('.bit-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
         document.getElementById('ana-hint').innerText = `正在檢視 Channel ${['R','G','B'][ch]} - Bit ${bit}`;
 
-        // 定義一個內部函式來繪製單張圖
         const renderCanvas = (slotId) => {
             const source = imgDataStore[slotId];
-            if (!source.original) return; // 沒圖就跳過
+            if (!source.original) return;
 
             const canvas = document.getElementById(`ana-canvas-${slotId}`);
             const ctx = canvas.getContext('2d');
             
-            // 複製一份原始數據來修改
             const imageData = new ImageData(
                 new Uint8ClampedArray(source.original.data), 
                 source.width, 
@@ -691,14 +756,12 @@
             for(let i=0; i<data.length; i+=4) {
                 const val = data[i+ch];
                 const bitVal = (val >> bit) & 1;
-                // 視覺化：0變黑, 1變白
                 const color = bitVal * 255;
                 data[i] = color; data[i+1] = color; data[i+2] = color;
             }
             ctx.putImageData(imageData, 0, 0);
         };
 
-        // 同時繪製 Slot 1 和 Slot 2
         renderCanvas(1);
         renderCanvas(2);
     }
