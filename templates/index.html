@@ -101,6 +101,13 @@
 
 <div class="container">
     <h1>🕵️‍♂️ 終極隱寫術工具箱</h1>
+
+    <div class="tabs">
+        <div class="tab active" onclick="setMode('encode')">加密 (Encode)</div>
+        <div class="tab" onclick="setMode('decode')">解密 (Decode)</div>
+        <div class="tab analyze-tab" onclick="setMode('analyze')">👁️ 偵測 (Analyze)</div>
+        <div class="tab" style="color: #e67e22;" onclick="setMode('dct')">🌊 浮水印 (DCT)</div>
+    </div>
     
     <div class="controls-wrapper">
         <div class="control-header">
@@ -116,13 +123,6 @@
         <p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 8px;">
             提示：Bit 0 對畫質影響最小，Bit 7 影響最大。解密時必須與加密設定完全一致。
         </p>
-    </div>
-
-    <div class="tabs">
-        <div class="tab active" onclick="setMode('encode')">加密 (Encode)</div>
-        <div class="tab" onclick="setMode('decode')">解密 (Decode)</div>
-        <div class="tab analyze-tab" onclick="setMode('analyze')">👁️ 偵測 (Analyze)</div>
-        <div class="tab" style="color: #e67e22;" onclick="setMode('dct')">🌊 浮水印 (DCT)</div>
     </div>
 
     <div id="encode-panel" class="panel active">
