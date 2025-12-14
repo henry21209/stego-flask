@@ -225,14 +225,14 @@
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.getElementById(`${mode}-panel`).classList.add('active');
 
-        // 3. ✨ 新增功能：根據模式顯示/隱藏「位元地圖」
+        // 3. ✨ 優化：在 DCT 或 Analyze 模式下，隱藏上方的位元地圖
         const controlWrapper = document.querySelector('.controls-wrapper');
         
-        if (mode === 'dct') {
-            // 如果是 DCT 模式，把位元選擇區藏起來 (因為用不到)
+        // 如果是 DCT (浮水印) 或 Analyze (偵測)，都把上面的勾選框藏起來
+        if (mode === 'dct' || mode === 'analyze') {
             controlWrapper.style.display = 'none';
         } else {
-            // 如果是其他模式 (Encode/Decode/Analyze)，顯示出來
+            // 只有 Encode (加密) 和 Decode (解密) 需要它
             controlWrapper.style.display = 'block';
         }
     }
