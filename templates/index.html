@@ -217,10 +217,24 @@
     }
 
     function setMode(mode) {
+        // 1. 處理 Tab 樣式
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
+        
+        // 2. 處理面板切換
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.getElementById(`${mode}-panel`).classList.add('active');
+
+        // 3. ✨ 新增功能：根據模式顯示/隱藏「位元地圖」
+        const controlWrapper = document.querySelector('.controls-wrapper');
+        
+        if (mode === 'dct') {
+            // 如果是 DCT 模式，把位元選擇區藏起來 (因為用不到)
+            controlWrapper.style.display = 'none';
+        } else {
+            // 如果是其他模式 (Encode/Decode/Analyze)，顯示出來
+            controlWrapper.style.display = 'block';
+        }
     }
 
     function getBitMap() {
