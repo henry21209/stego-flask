@@ -254,7 +254,7 @@
 <body>
 
 <div class="container">
-    <h1>🕵️‍♂️ 終極隱寫術工具箱</h1>
+    <h1>隱寫術工具箱</h1>
 
     <div class="tabs">
         <div class="tab active" onclick="setMode('encode')">加密 (Encode)</div>
@@ -265,7 +265,7 @@
     
     <div class="controls-wrapper">
         <div class="control-header">
-            <strong>🔑 位元地圖 (Bit Map) - 加解密的鑰匙</strong>
+            <strong> 位元地圖 (Bit Map) - 加解密的鑰匙</strong>
             <button class="reset-btn" onclick="resetToDefault()">↺ 重設為預設 (LSB)</button>
         </div>
         <div class="bit-grid" id="bitGrid">
@@ -285,22 +285,22 @@
             <input type="file" id="enc-file" accept="image/*">
         </div>
         <div class="form-group">
-            <label>2. 輸入秘密訊息</label>
+            <label>2. 輸入訊息</label>
             <textarea id="enc-msg" placeholder="在此輸入文字..."></textarea>
         </div>
-        <button class="btn btn-blue" onclick="process('encode')">🔒 寫入隱藏訊息並下載</button>
+        <button class="btn btn-blue" onclick="process('encode')">寫入隱藏訊息並下載</button>
         <div id="enc-status" class="status-msg"></div>
     </div>
 
     <div id="decode-panel" class="panel">
         <div class="form-group">
-            <label>上傳含有秘密的圖片</label>
+            <label>上傳圖片</label>
             <input type="file" id="dec-file" accept="image/*">
         </div>
         
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-green" onclick="process('decode')">🔓 依設定解密</button>
-            <button class="btn btn-purple" onclick="autoDecode()">🪄 自動暴力破解</button>
+            <button class="btn btn-green" onclick="process('decode')">依設定解密</button>
+            <button class="btn btn-purple" onclick="autoDecode()"> 自動暴力破解</button>
         </div>
         
         <div id="result-area">
@@ -375,8 +375,8 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-            <button class="btn" style="background: #e67e22;" onclick="processDCT('encode')">🔨 製作浮水印</button>
-            <button class="btn" style="background: #d35400;" onclick="processDCT('decode')">🔍 提取浮水印</button>
+            <button class="btn" style="background: #e67e22;" onclick="processDCT('encode')">製作浮水印</button>
+            <button class="btn" style="background: #d35400;" onclick="processDCT('decode')">提取浮水印</button>
         </div>
         
         <div id="dct-status" class="status-msg"></div>
