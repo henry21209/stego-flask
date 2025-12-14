@@ -86,6 +86,7 @@
         <div class="tab active" onclick="setMode('encode')">加密 (Encode)</div>
         <div class="tab" onclick="setMode('decode')">解密 (Decode)</div>
         <div class="tab analyze-tab" onclick="setMode('analyze')">👁️ 偵測 (Analyze)</div>
+        <div class="tab" style="color: #e67e22;" onclick="setMode('dct')">🌊 浮水印 (DCT)</div>
     </div>
 
     <div id="encode-panel" class="panel active">
@@ -138,6 +139,35 @@
             <div id="btn-group-1" class="btn-group"></div>
             <div style="color:#3498db; font-weight:bold; line-height:30px;">B</div>
             <div id="btn-group-2" class="btn-group"></div>
+        </div>
+    </div>
+
+    <div id="dct-panel" class="panel">
+        <div style="background: #fff3e0; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #ffcc80;">
+            <strong>🌊 什麼是 DCT 浮水印？</strong><br>
+            不同於上面的 LSB 加密，DCT 技術是將文字刻在圖片的「頻率」中。<br>
+            <span style="color: #d35400; font-size: 0.9em;">特點：抗壓縮 (存成 JPG 也不會消失)、抗裁切，但能藏的字數較少。</span>
+        </div>
+
+        <div class="form-group">
+            <label>1. 上傳圖片</label>
+            <input type="file" id="dct-file" accept="image/*">
+        </div>
+        
+        <div class="form-group">
+            <label>2. 浮水印內容 (建議簡短，如版權名)</label>
+            <input type="text" id="dct-msg" placeholder="例如: ©Henry2025" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid #ddd; border-radius:6px;">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" style="background: #e67e22;" onclick="processDCT('encode')">🔨 製作浮水印</button>
+            <button class="btn" style="background: #d35400;" onclick="processDCT('decode')">🔍 提取浮水印</button>
+        </div>
+        
+        <div id="dct-status" class="status-msg"></div>
+        <div id="dct-result-box" class="result-box" style="display:none; margin-top:15px; border-left-color: #e67e22;">
+            <strong>提取結果：</strong><br>
+            <span id="dct-res-text"></span>
         </div>
     </div>
 </div>
@@ -265,6 +295,56 @@
         } catch(e) {
             console.error("詳細錯誤內容:", e);
             statusEl.innerText = "錯誤: " + (e.message || "未知錯誤");
+            statusEl.style.color = "red";
+        }
+    }
+
+    async function processDCT(action) {
+        const fileInput = document.getElementById('dct-file');
+        const msgInput = document.getElementById('dct-msg');
+        const statusEl = document.getElementById('dct-status');
+        const resBox = document.getElementById('dct-result-box');
+        
+        statusEl.innerText = (action === 'dct_encode' ? "製作中..." : "分析中...");
+        statusEl.style.color = "#333";
+        resBox.style.display = 'none';
+
+        if(!fileInput.files[0]) { alert("請選擇圖片"); return; }
+        if(action === 'encode' && !msgInput.value) { alert("請輸入浮水印文字"); return; }
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        if(action === 'encode') formData.append('message', msgInput.value);
+
+        // 對應後端路由名稱
+        const route = action === 'encode' ? '/dct_encode' : '/dct_decode';
+
+        try {
+            const res = await fetch(route, { method: 'POST', body: formData });
+            
+            if(!res.ok) {
+                const errText = await res.text();
+                throw new Error(errText || `伺服器錯誤 (${res.status})`);
+            }
+
+            if(action === 'encode') {
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'dct_watermark.png';
+                document.body.appendChild(a); a.click(); a.remove();
+                statusEl.innerText = "✅ 浮水印製作成功！";
+                statusEl.style.color = "green";
+            } else {
+                const data = await res.json();
+                document.getElementById('dct-res-text').innerText = data.message;
+                resBox.style.display = 'block';
+                statusEl.innerText = "✅ 分析完成";
+                statusEl.style.color = "green";
+            }
+        } catch(e) {
+            console.error(e);
+            statusEl.innerText = "錯誤: " + e.message;
             statusEl.style.color = "red";
         }
     }

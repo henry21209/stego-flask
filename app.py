@@ -4,6 +4,7 @@ from PIL import Image
 import io
 import json
 import os
+from core.dct import embed_dct, extract_dct, DCTError
 
 # 引入我們分離出去的核心邏輯
 from core.stego import encode_image, decode_image, StegoError
@@ -106,6 +107,63 @@ def handle_auto_decode():
                 })
         
         return jsonify({"success": False, "message": "自動破解失敗"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# ==========================================
+#  DCT 浮水印路由
+# ==========================================
+
+@app.route('/dct_encode', methods=['POST'])
+def handle_dct_encode():
+    try:
+        file = request.files.get('image')
+        message = request.form.get('message')
+        
+        if not file or not message:
+            return jsonify({"error": "缺少必要資料"}), 400
+        
+        img = Image.open(file.stream)
+        # DCT 不需要 bit_map，但同樣需要縮圖防爆，避免運算過久
+        # 注意：DCT 演算法需要 8 的倍數，簡單縮圖即可
+        if img.width > 1000 or img.height > 1000:
+             img.thumbnail((1000, 1000))
+        
+        # 確保是 RGB
+        img = img.convert("RGB")
+        
+        # 呼叫 DCT 核心
+        watermarked_img = embed_dct(img, message)
+        
+        output_buffer = io.BytesIO()
+        # 這裡一定要存成 JPEG 來證明它抗壓縮！(原本 PNG 是無損的，DCT 強項是 JPG)
+        # 但為了方便 demo，我們先存 PNG，可以請使用者自己轉 JPG 測試
+        watermarked_img.save(output_buffer, format="PNG")
+        output_buffer.seek(0)
+        
+        return send_file(
+            output_buffer, 
+            mimetype='image/png', 
+            as_attachment=True, 
+            download_name='dct_watermark.png'
+        )
+
+    except DCTError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "DCT 處理錯誤: " + str(e)}), 500
+
+@app.route('/dct_decode', methods=['POST'])
+def handle_dct_decode():
+    try:
+        file = request.files.get('image')
+        if not file: return jsonify({"error": "未上傳圖片"}), 400
+
+        img = Image.open(file.stream).convert("RGB")
+        msg = extract_dct(img)
+        
+        return jsonify({"message": msg})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
