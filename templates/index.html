@@ -259,8 +259,8 @@
     <div class="tabs">
         <div class="tab active" onclick="setMode('encode')">加密 (Encode)</div>
         <div class="tab" onclick="setMode('decode')">解密 (Decode)</div>
-        <div class="tab analyze-tab" onclick="setMode('analyze')">👁️ 偵測 (Analyze)</div>
-        <div class="tab" style="color: #e67e22;" onclick="setMode('dct')">🌊 浮水印 (DCT)</div>
+        <div class="tab analyze-tab" onclick="setMode('analyze')">偵測 (Analyze)</div>
+        <div class="tab" style="color: #e67e22;" onclick="setMode('dct')">浮水印 (DCT)</div>
     </div>
     
     <div class="controls-wrapper">
@@ -314,7 +314,7 @@
 
     <div id="analyze-panel" class="panel">
         <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #90caf9;">
-            <strong>👁️ 比較模式：</strong><br>
+            <strong>比較模式：</strong><br>
             <span style="color: #1565c0; font-size: 0.9em;">
                 你可以只上傳左邊 (單張檢視)，也可以同時上傳右邊 (進行對照)。
             </span>
@@ -359,7 +359,7 @@
 
     <div id="dct-panel" class="panel">
         <div style="background: #fff3e0; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #ffcc80;">
-            <strong>🌊 什麼是 DCT 浮水印？</strong><br>
+            <strong>什麼是 DCT 浮水印？</strong><br>
             不同於上面的 LSB 加密，DCT 技術是將文字刻在圖片的「頻率」中。<br>
             <span style="color: #d35400; font-size: 0.9em;">特點：抗壓縮 (存成 JPG 也不會消失)、抗裁切，但能藏的字數較少。</span>
         </div>
