@@ -51,7 +51,43 @@
         .result-box { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); word-break: break-all; white-space: pre-wrap; }
         
         /* 偵測 Canvas */
-        .canvas-container { margin: 15px 0; border: 2px dashed #ccc; background: #222; min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 8px; }
+        /* 修改 .canvas-container 讓它支援兩個畫布 */
+        .canvas-container { 
+            margin: 15px 0; 
+            border: 2px dashed #ccc; 
+            background: #222; 
+            min-height: 200px; 
+            padding: 10px; 
+            border-radius: 8px; 
+            
+            /* 使用 Flexbox 讓畫布並排 */
+            display: flex; 
+            flex-wrap: wrap; /* 手機版會自動換行 */
+            justify-content: center; 
+            gap: 15px; 
+        }
+        
+        /* 每個畫布的包裝容器 */
+        .canvas-box {
+            text-align: center;
+            max-width: 48%; /* 讓兩張圖各佔一半 */
+            min-width: 300px;
+        }
+        
+        .canvas-box canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #555;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .canvas-label {
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
         canvas { max-width: 100%; max-height: 400px; }
         
         .bit-buttons-grid { display: grid; grid-template-columns: 30px 1fr; gap: 10px; margin-top: 15px; }
@@ -123,14 +159,39 @@
     </div>
 
     <div id="analyze-panel" class="panel">
-        <div class="form-group">
-            <label>上傳要檢查的圖片</label>
-            <input type="file" id="ana-file" accept="image/*">
+        <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #90caf9;">
+            <strong>👁️ 比較模式：</strong><br>
+            <span style="color: #1565c0; font-size: 0.9em;">
+                你可以只上傳左邊 (單張檢視)，也可以同時上傳右邊 (進行對照)。
+            </span>
         </div>
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1;">
+                <label>1. 上傳原圖 (或是圖片 A)</label>
+                <input type="file" id="ana-file-1" accept="image/*">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>2. 上傳加密圖 (或是圖片 B)</label>
+                <input type="file" id="ana-file-2" accept="image/*">
+            </div>
+        </div>
+
         <div class="canvas-container">
-            <canvas id="ana-canvas"></canvas>
+            <div class="canvas-box" id="box-1" style="display:none;">
+                <div class="canvas-label">圖片 A (Original)</div>
+                <canvas id="ana-canvas-1"></canvas>
+            </div>
+            
+            <div class="canvas-box" id="box-2" style="display:none;">
+                <div class="canvas-label">圖片 B (Modified)</div>
+                <canvas id="ana-canvas-2"></canvas>
+            </div>
+            
+            <div id="empty-msg" style="color: #666; align-self: center;">請上傳至少一張圖片</div>
         </div>
-        <p style="text-align: center; color: #666; font-size: 0.9rem;" id="ana-hint">請點擊下方按鈕切換不同位元層</p>
+        
+        <p style="text-align: center; color: #666; font-size: 0.9rem;" id="ana-hint">圖片載入後，請點擊下方按鈕切換位元層</p>
         
         <div class="bit-buttons-grid">
             <div style="color:#e74c3c; font-weight:bold; line-height:30px;">R</div>
@@ -404,46 +465,99 @@
         }
     }
 
-    // === 3. 視覺化偵測邏輯 ===
-    let anaImg = new Image();
-    let originalImageData = null;
-    const canvas = document.getElementById('ana-canvas');
-    const ctx = canvas.getContext('2d');
+    // === 3. 視覺化偵測邏輯 (雙圖比較版) ===
+    
+    // 儲存兩張圖片的原始數據
+    const imgDataStore = {
+        1: { original: null, width: 0, height: 0 },
+        2: { original: null, width: 0, height: 0 }
+    };
 
-    document.getElementById('ana-file').addEventListener('change', function(e) {
-        if(e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                anaImg.src = evt.target.result;
-                anaImg.onload = () => {
-                    canvas.width = anaImg.width;
-                    canvas.height = anaImg.height;
-                    ctx.drawImage(anaImg, 0, 0);
-                    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    document.getElementById('ana-hint').innerText = "圖片已載入，請選擇通道查看。";
+    // 綁定兩個上傳按鈕的事件
+    setupAnalyzeUpload('ana-file-1', 1);
+    setupAnalyzeUpload('ana-file-2', 2);
+
+    function setupAnalyzeUpload(inputId, slotId) {
+        document.getElementById(inputId).addEventListener('change', function(e) {
+            if(e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const img = new Image();
+                    img.src = evt.target.result;
+                    img.onload = () => {
+                        // 1. 顯示對應的畫布容器
+                        document.getElementById(`box-${slotId}`).style.display = 'block';
+                        document.getElementById('empty-msg').style.display = 'none';
+
+                        // 2. 繪製到 Canvas 並提取原始數據
+                        const canvas = document.getElementById(`ana-canvas-${slotId}`);
+                        const ctx = canvas.getContext('2d');
+                        
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // 3. 存入全域變數
+                        imgDataStore[slotId].original = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        imgDataStore[slotId].width = img.width;
+                        imgDataStore[slotId].height = img.height;
+                        
+                        // 4. 自動重繪目前選中的 Bit (如果有的話)
+                        const activeBtn = document.querySelector('.bit-btn.active');
+                        if (activeBtn) {
+                            activeBtn.click(); // 觸發重繪
+                        } else {
+                            document.getElementById('ana-hint').innerText = "圖片已載入，請選擇通道查看。";
+                        }
+                    };
                 };
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
 
     function visualizeBit(ch, bit, btn) {
-        if(!originalImageData) { alert("請先上傳圖片"); return; }
+        // 如果兩張圖都沒有，就不執行
+        if(!imgDataStore[1].original && !imgDataStore[2].original) { 
+            alert("請至少上傳一張圖片"); 
+            return; 
+        }
         
+        // 更新按鈕樣式
         document.querySelectorAll('.bit-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        const imageData = new ImageData(new Uint8ClampedArray(originalImageData.data), canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        for(let i=0; i<data.length; i+=4) {
-            const val = data[i+ch];
-            const bitVal = (val >> bit) & 1;
-            const color = bitVal * 255;
-            data[i] = color; data[i+1] = color; data[i+2] = color;
-        }
-        ctx.putImageData(imageData, 0, 0);
         document.getElementById('ana-hint').innerText = `正在檢視 Channel ${['R','G','B'][ch]} - Bit ${bit}`;
+
+        // 定義一個內部函式來繪製單張圖
+        const renderCanvas = (slotId) => {
+            const source = imgDataStore[slotId];
+            if (!source.original) return; // 沒圖就跳過
+
+            const canvas = document.getElementById(`ana-canvas-${slotId}`);
+            const ctx = canvas.getContext('2d');
+            
+            // 複製一份原始數據來修改
+            const imageData = new ImageData(
+                new Uint8ClampedArray(source.original.data), 
+                source.width, 
+                source.height
+            );
+            const data = imageData.data;
+            
+            for(let i=0; i<data.length; i+=4) {
+                const val = data[i+ch];
+                const bitVal = (val >> bit) & 1;
+                // 視覺化：0變黑, 1變白
+                const color = bitVal * 255;
+                data[i] = color; data[i+1] = color; data[i+2] = color;
+            }
+            ctx.putImageData(imageData, 0, 0);
+        };
+
+        // 同時繪製 Slot 1 和 Slot 2
+        renderCanvas(1);
+        renderCanvas(2);
     }
 </script>
 
