@@ -6,52 +6,150 @@
     <title>終極隱寫術工具箱</title>
     <style>
         :root { --primary: #4a90e2; --success: #2ecc71; --danger: #e74c3c; --warn: #f39c12; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; min-height: 100vh; box-sizing: border-box; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
-        h1 { text-align: center; color: #333; margin-bottom: 20px; }
         
-        /* 位元選擇區 */
-        .controls-wrapper { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-        .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .reset-btn { background: #e0e0e0; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .reset-btn:hover { background: #d0d0d0; }
-        
-        .bit-grid { display: grid; grid-template-columns: 40px repeat(3, 1fr); gap: 6px; text-align: center; }
-        .grid-header { font-weight: bold; padding: 6px; border-radius: 4px; font-size: 0.9rem; }
-        .grid-row-label { font-weight: bold; line-height: 28px; color: #777; font-size: 0.9rem; }
-        .bit-check { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+        /* 基礎設定 */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            display: flex; 
+            justify-content: center; 
+            padding: 15px; /* 手機版邊距縮小 */
+            min-height: 100vh; 
+            box-sizing: border-box; 
+            margin: 0;
+        }
 
-        /* Tabs */
-        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-        .tab { flex: 1; padding: 12px; cursor: pointer; text-align: center; font-weight: bold; color: #aaa; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .container { 
+            background: white; 
+            padding: 1.5rem; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 700px; 
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin: 10px 0 20px 0; 
+            font-size: 1.5rem; /* 手機版標題不要太大 */
+        }
+        
+        /* Tabs 分頁選單 - RWD 優化 */
+        .tabs { 
+            display: flex; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid #eee; 
+            flex-wrap: wrap; /* 螢幕太小自動換行 */
+        }
+        .tab { 
+            flex: 1; 
+            padding: 12px 5px; /* 減少左右 padding 塞下更多字 */
+            cursor: pointer; 
+            text-align: center; 
+            font-weight: bold; 
+            color: #aaa; 
+            transition: 0.3s; 
+            border-bottom: 3px solid transparent; 
+            font-size: 0.95rem;
+            white-space: nowrap; /* 防止文字斷行 */
+        }
         .tab:hover { background: #f9f9f9; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
         .tab.analyze-tab.active { color: var(--warn); border-bottom: 3px solid var(--warn); }
+
+        /* 位元選擇區 - RWD 優化 */
+        .controls-wrapper { 
+            background: #fafafa; 
+            border: 1px solid #eee; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            animation: fadeIn 0.3s;
+        }
+        .control-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            flex-wrap: wrap; 
+            gap: 10px;
+        }
+        
+        .reset-btn { 
+            background: #e0e0e0; 
+            border: none; 
+            padding: 8px 15px; /* 加大按鈕 */
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            transition: 0.2s; 
+        }
+        .reset-btn:hover { background: #d0d0d0; }
+        
+        /* Grid 系統 */
+        .bit-grid { display: grid; grid-template-columns: 40px repeat(3, 1fr); gap: 6px; text-align: center; }
+        .grid-header { font-weight: bold; padding: 6px; border-radius: 4px; font-size: 0.9rem; }
+        .grid-row-label { font-weight: bold; line-height: 28px; color: #777; font-size: 0.9rem; }
+        
+        /* 🔥 加大手機勾選框，比較好按 */
+        .bit-check { 
+            width: 24px; 
+            height: 24px; 
+            cursor: pointer; 
+            accent-color: var(--primary); 
+            vertical-align: middle;
+        }
 
         /* Panels */
         .panel { display: none; animation: fadeIn 0.3s; }
         .panel.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* UI Elements */
+        /* 表單元素 - 防止 iOS 放大 */
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
-        input[type="file"], textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        
+        /* 設定 font-size 16px 防止 iOS 輸入時自動放大畫面 */
+        input[type="file"], textarea, input[type="text"] { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 16px; 
+        }
         textarea { min-height: 100px; resize: vertical; font-family: inherit; }
         
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; color: white; transition: 0.2s; margin-top: 10px; }
+        /* 按鈕優化 */
+        .btn { 
+            width: 100%; 
+            padding: 14px; /* 加高按鈕 */
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: bold; 
+            color: white; 
+            transition: 0.2s; 
+            margin-top: 10px; 
+            /* 防止連點選取文字 */
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
+        .btn:active { transform: scale(0.98); } /* 點擊回饋 */
         .btn-blue { background: var(--primary); } .btn-blue:hover { background: #357abd; }
         .btn-green { background: var(--success); } .btn-green:hover { background: #27ae60; }
         .btn-purple { background: #9b59b6; } .btn-purple:hover { background: #8e44ad; }
         
-        .status-msg { margin-top: 10px; text-align: center; font-size: 0.95rem; font-weight: 500; min-height: 20px; }
+        .status-msg { margin-top: 15px; text-align: center; font-size: 1rem; font-weight: 500; min-height: 20px; line-height: 1.5; }
         
-        /* 解碼結果與偵測 */
+        /* 結果區域 */
         #result-area { margin-top: 15px; display: none; }
-        .result-box { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); word-break: break-all; white-space: pre-wrap; }
+        .result-box { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); word-break: break-all; white-space: pre-wrap; font-size: 0.95rem; }
         
-        /* 偵測 Canvas */
-        /* 修改 .canvas-container 讓它支援兩個畫布 */
+        /* 偵測 Canvas 響應式 */
         .canvas-container { 
             margin: 15px 0; 
             border: 2px dashed #ccc; 
@@ -59,42 +157,87 @@
             min-height: 200px; 
             padding: 10px; 
             border-radius: 8px; 
-            
-            /* 使用 Flexbox 讓畫布並排 */
             display: flex; 
-            flex-wrap: wrap; /* 手機版會自動換行 */
+            flex-wrap: wrap; /* 關鍵：讓它能換行 */
             justify-content: center; 
             gap: 15px; 
         }
         
-        /* 每個畫布的包裝容器 */
         .canvas-box {
             text-align: center;
-            max-width: 48%; /* 讓兩張圖各佔一半 */
+            width: 48%; /* 電腦版並排 */
             min-width: 300px;
         }
         
-        .canvas-box canvas {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #555;
-            display: block;
-            margin: 0 auto;
+        canvas { 
+            max-width: 100%; 
+            height: auto; 
+            border: 1px solid #555; 
+            display: block; 
+            margin: 0 auto; 
         }
         
-        .canvas-label {
-            color: #ccc;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        canvas { max-width: 100%; max-height: 400px; }
+        .canvas-label { color: #ccc; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
         
-        .bit-buttons-grid { display: grid; grid-template-columns: 30px 1fr; gap: 10px; margin-top: 15px; }
-        .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .bit-btn { flex: 1; padding: 6px 0; font-size: 0.8rem; cursor: pointer; background: #fff; border: 1px solid #ccc; border-radius: 4px; min-width: 30px; }
+        /* 偵測按鈕群組 */
+        .bit-buttons-grid { 
+            display: grid; 
+            grid-template-columns: 30px 1fr; 
+            gap: 10px; 
+            margin-top: 15px; 
+            align-items: center; 
+        }
+        .btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
+        .bit-btn { 
+            flex: 1; 
+            padding: 8px 0; /* 加高按鈕 */
+            font-size: 0.9rem; 
+            cursor: pointer; 
+            background: #fff; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            min-width: 35px; /* 確保按鈕不會太窄 */
+        }
         .bit-btn:hover { background: #eee; }
         .bit-btn.active { background: #333; color: white; border-color: black; }
+
+        /* 📱 手機版專用調整 (寬度小於 600px 時生效) */
+        @media (max-width: 600px) {
+            .container { padding: 15px; } /* 縮小外框內距，爭取空間 */
+            h1 { font-size: 1.4rem; }
+            
+            .tab { font-size: 0.85rem; padding: 10px 2px; }
+            .canvas-box { width: 100%; min-width: 100%; }
+            
+            /* === 🔥 關鍵修改開始：讓 8 個按鈕強制一行 === */
+            
+            /* 1. 調整按鈕群組的排列方式 */
+            .btn-group { 
+                flex-wrap: nowrap; /* 禁止換行！ */
+                gap: 2px;          /* 按鈕間距縮小 */
+            }
+            
+            /* 2. 縮小按鈕尺寸 */
+            .bit-btn { 
+                padding: 8px 0; 
+                font-size: 0.75rem; /* 字變小一點 */
+                min-width: 0;       /* 移除最小寬度限制，讓它能縮小 */
+                flex: 1;            /* 大家平分空間 */
+            }
+            
+            /* 3. 調整標籤 R/G/B 的寬度與字體 */
+            .bit-buttons-grid {
+                grid-template-columns: 20px 1fr; /* 左邊標籤改窄一點 */
+                gap: 5px; /* 標籤與按鈕的距離縮小 */
+            }
+            
+            .bit-buttons-grid > div:nth-child(odd) {
+                font-size: 0.9rem; /* R G B 字體微調 */
+            }
+            /* === 關鍵修改結束 === */
+
+            label { margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
